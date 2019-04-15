@@ -2,8 +2,9 @@ from flask import Flask , render_template ,request ,flash , redirect , url_for ,
 from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
 from wtforms import Form , StringField , TextAreaField, PasswordField , validators
-
+from functools import wraps
 from data import Articles
+
 app = Flask(__name__)
 
 articles = Articles()
@@ -104,7 +105,22 @@ def login():
             error = "Username not found"
             return render_template('login.html' , error = error)
     return render_template('login.html')
+
+
+
+def is_logged_in(g):
+    @wraps(g)
+    def wrap(*args , **kwargs):
+        if 'logged_in' in session:
+            return g(*args , **kwargs)
+        else:
+            flash("Un authorized, Please login " , "danger")
+            return redirect(url_for('login'))
+    return wrap
+
+
 @app.route('/logout')
+@is_logged_in
 def logout():
     session.clear()
     flash("You are now logged out" , "success")
@@ -112,10 +128,38 @@ def logout():
 
     
 @app.route('/dashboard')
+@is_logged_in
 def dashboard():
-    return render_template('dashboard.html')
+    cur = mysql.connection.cursor()
+    result = cur.execute("SELECT * FROM articles")
+    articles= cur.fetchall()
+    if result > 0:
+        return render_template('dashboard.html' , articles=articles)
+    else:
+        msg = "No article found"
+        return render_template('dashboard.html' , msg=msg)
+    cur.close()
 
 
+
+class ArticleForm(Form):
+    title = StringField('Title' , [validators.Length(min=1 , max=50)])
+    body = TextAreaField('Body' , [validators.Length(min=10)])
+
+
+@app.route('/create_article' , methods=['GET' , 'POST'])
+def add_article():
+    form = ArticleForm(request.form)
+    if request.method == 'POST' and form.validate():
+        title = form.title.data
+        body = form.body.data
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO articles(title , body , author) VALUES(%s , %s , %s)", (title,body,session['username']))
+        mysql.connection.commit()
+        cur.close()
+        flash("Article created" , "success")
+        return redirect(url_for('dashboard'))
+    return render_template("add_article.html" , form=form)
 
 if __name__ == '__main__':
     app.secret_key = 'secret123'

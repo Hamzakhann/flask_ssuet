@@ -77,3 +77,46 @@ def login():
             error = "Username not found"
             return render_template('login.html' ,error = error)
     return render_template('login.html')
+
+
+
+
+    <===============>Last class <========================>
+ 1*   CREATE TABLE articles (id INT(11) AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255), author VARCHAR(100), body TEXT, create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+
+ 2* Add link /add_article in dashboard.html
+
+ 3* Make class of add article with wtf
+
+
+ 4* make route of add_article
+
+ cur.execute("INSERT INTO articles(title , body , author) VALUES(%s , %s , %s)", (title,body,session['username']))
+
+ 5* Create form with render_field
+
+ 6*Add ckeditor cdn 
+
+ 7* add MySQL query in dashboard
+
+ cur = mysql.connection.cursor()
+    
+    result = cur.execute("SELECT * FROM articles")
+    articles= cur.fetchall()
+    if result > 0:
+        return render_template('dashboard.html' , articles=articles)
+    else:
+        msg = "No article found"
+        return render_template('dashboard.html' , msg=msg)
+
+    cur.close()
+
+
+
+@app.route('/article/<string:id>')
+def article(id):
+    cur = mysql.connection.cursor()
+
+    result = cur.execute("SELECT * FROM articles WHERE id = %s",[id])
+    article = cur.fetchone()
+    return render_template('article.html' ,  article=article )

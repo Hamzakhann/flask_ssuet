@@ -3,7 +3,7 @@
 
 {%block body%}
 <h1>Dshboard <small>Wellcome {{session.username}}</small> </h1>
-<a class="btn btn-success" href="/create_article" >Add Articles</a>
+<a class="btn btn-success" href="/add_article" >Add Articles</a>
 <table class="table table-striped" >
 <tr>
     <th>ID</th>
@@ -19,8 +19,13 @@
 <td>{{article.title}}</td>
 <td>{{article.author}}</td>
 <td>{{article.create_date}}</td>
-<td><a href="edit_aticle/{{article.id}}" class="btn btn-success pull-right"  >Edit</a></td>
-<td><a href="" class="btn btn-danger pull-right"  >Delete</a></td>
+<td><a href="edit_article/{{article.id}}" class="btn btn-success pull-right"  >Edit</a></td>
+<td>
+    <form action="{{url_for('delete_article' , id=article.id)}}" method="post" > 
+        <input type="hidden" name="_method" id="DELETE">
+        <input type="submit" value="Delete" class="btn btn-danger" />
+    </form>
+</td>
 
 </tr>
 {%endfor%}

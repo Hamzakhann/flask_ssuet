@@ -1,15 +1,13 @@
-{%extends 'layout.html' %}
-{% block body %}
-<div class="jumbotron mt-2 text-center" >
-<h1>This is my First Flask App</h1>
-<p>Lorem ipsum dolor sit 
-    amet consectetur adipisicing elit.
-     Soluta maiores nobis earum, 
-     necessitatibus eveniet laudantium ea
-      optio modi. Praesentium cupiditate 
-      explicabo quisquam sequi minima facere iure
-       laborum maiores, voluptatibus reprehenderit?</p>
+{%extends 'layout.html'%}
+
+
+{%block body%}
+<div class="jumbotron text-center mt-3" >
+    <h1>Welcome to flask App</h1>
+    <p class="lead" >Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat totam animi enim veniam deserunt atque porro nihil ex ipsum necessitatibus, dignissimos aperiam maxime magni nobis recusandae, maiores a! Commodi, optio! </p>
+{%if session.logged_in == NULL%}
+<a href="/register" class="btn btn-primary btn-block" >Register</a>
+<a href="/login" class="btn btn-success btn-block" >Login</a>
+{%endif%}
 </div>
-{% endblock %}
-
-
+{%endblock%}
